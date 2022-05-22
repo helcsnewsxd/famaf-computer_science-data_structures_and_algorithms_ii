@@ -1,0 +1,1 @@
+El error de compilacion que surge luego de compilar directamente como dice el ejercicio 3 es por la redefinicion del tipo de mybool ya que lo llamamos tanto en array_helpers.h como en array_helpers.c
