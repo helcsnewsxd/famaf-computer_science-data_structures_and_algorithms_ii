@@ -12,11 +12,9 @@ struct _node_t {
 
 //---------------- FUNCIONES AUXILIARES -------------------
 
-bool asserting(bool b){ // Está para no tener que descomentar los assert uno por uno si los quiero usar
-	bool ret = b;
-	ret = true; // Comentar para que funcionen los assert
-	return ret;
-}
+#define asserting true // para que no me hagan los assert. Poner en false para que los verifique
+					   // se usa para que no me ande lento el programa
+					   // y no tener que comentar y descomentar los assert uno por uno
 
 static bool invrep(dict_t dict) {
 	bool ret = true;
@@ -29,7 +27,7 @@ static bool invrep(dict_t dict) {
 }
 
 dict_t search_father(dict_t dict, key_t key){
-	assert(asserting( invrep(dict) ));
+	assert(asserting || invrep(dict) );
 	dict_t father = NULL;
 
 	if(dict != NULL){
@@ -47,7 +45,7 @@ dict_t search_father(dict_t dict, key_t key){
 			}
 		}
 	}
-	assert(asserting( invrep(dict) ));
+	assert(asserting || invrep(dict) );
 	return father;
 }
 
@@ -61,26 +59,26 @@ dict_t create_node(key_t key, value_t value){
 }
 
 dict_t dict_max_key(dict_t dict){
-	assert(asserting( invrep(dict) ));
+	assert(asserting || invrep(dict) );
 	dict_t maxi = dict;
 
 	if(dict->right != NULL){
 		maxi = dict_max_key(dict->right);
 	}
 
-	assert(asserting( invrep(dict) ));
+	assert(asserting || invrep(dict) );
 	return maxi;
 }
 
 dict_t dict_min_key(dict_t dict){
-	assert(asserting( invrep(dict) ));
+	assert(asserting || invrep(dict) );
 	dict_t mini = dict;
 
 	if(dict->left != NULL){
 		mini = dict_min_key(dict->left);
 	}
 
-	assert(asserting( invrep(dict) ));
+	assert(asserting || invrep(dict) );
 	return mini;
 }
 
@@ -110,12 +108,12 @@ void debug(dict_t dict){
 dict_t dict_empty(void) {
 	dict_t dict = NULL;
 
-	assert(asserting( invrep(dict) && dict_length(dict) == 0));
+	assert(asserting || (invrep(dict) && dict_length(dict) == 0));
 	return dict;
 }
 
 dict_t dict_add(dict_t dict, key_t word, value_t def) {
-	assert(asserting( invrep(dict) ));
+	assert(asserting || invrep(dict) );
 
 	if(dict == NULL){
 		dict = create_node(word,def);
@@ -137,12 +135,12 @@ dict_t dict_add(dict_t dict, key_t word, value_t def) {
 		}
 	}
 
-	assert(asserting( invrep(dict) && key_eq(def, dict_search(dict,word)) ));
+	assert(asserting || (invrep(dict) && key_eq(def, dict_search(dict,word)) ));
     return dict;
 }
 
 value_t dict_search(dict_t dict, key_t word) {
-	assert(asserting( invrep(dict) ));
+	assert(asserting || ( invrep(dict) ));
 
     key_t def=NULL;
 
@@ -161,22 +159,22 @@ value_t dict_search(dict_t dict, key_t word) {
 		}
 	}
 
-	assert(asserting( (def != NULL) == dict_exists(dict,word) ));
+	assert(asserting || ( (def != NULL) == dict_exists(dict,word) ));
     return def;
 }
 
 bool dict_exists(dict_t dict, key_t word) {
-	assert(asserting( invrep(dict) ));
+	assert(asserting || ( invrep(dict) ));
 	return !(dict==NULL || (!key_eq(dict->key, word) && search_father(dict,word) == NULL));
 }
 
 unsigned int dict_length(dict_t dict) {
-	assert(asserting( invrep(dict) ));
+	assert(asserting || ( invrep(dict) ));
 	return (dict==NULL ? 0 : 1 + dict_length(dict->left) + dict_length(dict->right));
 }
 
 dict_t dict_remove(dict_t dict, key_t word) {
-	assert(asserting( invrep(dict) ));
+	assert(asserting || ( invrep(dict) ));
 
 	if(dict != NULL){
 		dict_t father = NULL, son = NULL;
@@ -223,33 +221,33 @@ dict_t dict_remove(dict_t dict, key_t word) {
 		}
 	}
 
-	assert(asserting( invrep(dict) && !dict_exists(dict,word) ));
+	assert(asserting || ( invrep(dict) && !dict_exists(dict,word) ));
     return dict;
 }
 
 dict_t dict_remove_all(dict_t dict) {
-	assert(asserting( invrep(dict) ));
+	assert(asserting || ( invrep(dict) ));
 
 	dict = dict_destroy(dict);
 
-	assert(asserting( invrep(dict) && dict_length(dict) == 0 ));
+	assert(asserting || ( invrep(dict) && dict_length(dict) == 0 ));
 	return dict;
 }
 
 void dict_dump(dict_t dict, FILE *file) {
-	assert(asserting( invrep(dict) && file != NULL ));
+	assert(asserting || ( invrep(dict) && file != NULL ));
 
 	if(dict != NULL){
 		dict_dump(dict->left,file);
 
-		key_dump(dict->key, file); printf(": "); value_dump(dict->value, file); printf("\n");
+		fprintf(file," - "); key_dump(dict->key, file); fprintf(file,": "); value_dump(dict->value, file); fprintf(file,"\n");
 
 		dict_dump(dict->right,file);
 	}
 }
 
 dict_t dict_destroy(dict_t dict) {
-	assert(asserting( invrep(dict) ));
+	assert(asserting || ( invrep(dict) ));
 
 	if(dict != NULL){
 		dict->left = dict_destroy(dict->left);
@@ -258,7 +256,7 @@ dict_t dict_destroy(dict_t dict) {
 		dict = NULL;
 	}
 
-	assert(asserting( dict == NULL ));
+	assert(asserting || ( dict == NULL ));
     return dict;
 }
 
