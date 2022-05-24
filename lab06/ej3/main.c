@@ -97,12 +97,12 @@ dict_t on_replace(dict_t current) {
     word = get_input("Please enter the word to replace in the dict");
     if (!dict_exists(current, word)) {
         printf(RESULT_PREFIX "The word does not exist in the dict.\n");
-        word = string_destroy(word);
     } else {
         definition = get_input("Please enter the new definition");
         current = dict_add(current, word, definition);
         printf(RESULT_PREFIX "The definition was replaced.\n");
     }
+    word = string_destroy(word);
     return (current);
 }
 

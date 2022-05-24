@@ -13,7 +13,7 @@ struct _node_t {
 
 //---------------- FUNCIONES AUXILIARES -------------------
 
-#define asserting true // para que no me hagan los assert. Poner en false para que los verifique
+#define asserting false // para que no me hagan los assert. Poner en false para que los verifique
 					   // se usa para que no me ande lento el programa
 					   // y no tener que comentar y descomentar los assert uno por uno
 
@@ -120,6 +120,7 @@ dict_t dict_add(dict_t dict, key_t word, value_t def) {
 		dict = create_node(word,def);
 	}else{
 		if(key_eq(dict->key, word)){
+			dict->value = value_destroy(dict->value);
 			dict->value = def;
 		}else if(key_less(word, dict->key)){
 			if(dict->left == NULL){
@@ -174,6 +175,7 @@ unsigned int dict_length(dict_t dict) {
 	return (dict==NULL ? 0 : 1 + dict_length(dict->left) + dict_length(dict->right));
 }
 
+// El verdadero remove
 dict_t dict_removing_piola(dict_t dict,key_t word,bool borro_word){
 	assert(asserting || ( invrep(dict) ));
 
@@ -239,7 +241,7 @@ dict_t dict_removing_piola(dict_t dict,key_t word,bool borro_word){
 dict_t dict_remove(dict_t dict, key_t word) {
 	assert(asserting || ( invrep(dict) ));
 
-	dict = dict_removing_piola(dict,word,true);
+	dict = dict_removing_piola(dict,word,true); // lo mando a mi remove recursivo
 
 	assert(asserting || ( invrep(dict) && !dict_exists(dict,word) ));
     return dict;
