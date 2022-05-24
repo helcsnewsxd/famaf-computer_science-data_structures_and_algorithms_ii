@@ -1,3 +1,4 @@
+#include<stdbool.h>
 #include<stdlib.h>
 #include <assert.h>
 #include "dict.h"
@@ -173,7 +174,7 @@ unsigned int dict_length(dict_t dict) {
 	return (dict==NULL ? 0 : 1 + dict_length(dict->left) + dict_length(dict->right));
 }
 
-dict_t dict_remove(dict_t dict, key_t word) {
+dict_t dict_removing_piola(dict_t dict,key_t word,bool borro_word){
 	assert(asserting || ( invrep(dict) ));
 
 	if(dict != NULL){
@@ -200,26 +201,45 @@ dict_t dict_remove(dict_t dict, key_t word) {
 				}else{
 					father->right = NULL;
 				}
+				if(!borro_word){
+					son->value=NULL;
+					son->key=NULL;
+				}
 				son = dict_destroy(son);
 			}else if(son->left != NULL){
+				son->key=key_destroy(son->key);
+				son->value=value_destroy(son->value);
 				dict_t new_data = dict_max_key(son->left);
 				son->key = new_data->key;
 				son->value = new_data->value;
-				son->left = dict_remove(son->left, son->key);
+				son->left = dict_removing_piola(son->left, son->key,false);
 			}else{
+				son->key=key_destroy(son->key);
+				son->value=value_destroy(son->value);
 				dict_t new_data = dict_min_key(son->right);
 				son->key = new_data->key;
 				son->value = new_data->value;
-				son->right = dict_remove(son->right, son->key);
+				son->right = dict_removing_piola(son->right, son->key,false);
 			}
 		}
 
 		if(have_to_erase_father){
 			father->right = NULL;
+			father->key = NULL;
+			father->value = NULL;
 			father = dict_destroy(father);
 			dict = son;
 		}
 	}
+
+	assert(asserting || ( invrep(dict) && !dict_exists(dict,word) ));
+    return dict;
+}
+
+dict_t dict_remove(dict_t dict, key_t word) {
+	assert(asserting || ( invrep(dict) ));
+
+	dict = dict_removing_piola(dict,word,true);
 
 	assert(asserting || ( invrep(dict) && !dict_exists(dict,word) ));
     return dict;
@@ -252,6 +272,8 @@ dict_t dict_destroy(dict_t dict) {
 	if(dict != NULL){
 		dict->left = dict_destroy(dict->left);
 		dict->right = dict_destroy(dict->right);
+		if(dict->key != NULL)dict->key = key_destroy(dict->key);
+		if(dict->value != NULL)dict->value = value_destroy(dict->value);
 		free(dict);
 		dict = NULL;
 	}
