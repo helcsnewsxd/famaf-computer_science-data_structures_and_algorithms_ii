@@ -54,7 +54,7 @@ static bool invrep(pstack s) {
         priority_t ant_priority = s->stack->priority;
         node act = s->stack->next;
         while(act != NULL){
-            inv = ant_priority >= act->priority;
+            inv &= ant_priority >= act->priority;
             ant_priority = act->priority;
             act = act->next;
         }
